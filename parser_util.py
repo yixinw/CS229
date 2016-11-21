@@ -19,64 +19,82 @@ from scipy.sparse import lil_matrix, dok_matrix
 import IPython
 import numpy as np
 from scipy.io import mmread, mmwrite
+import scipy.sparse
 import random
 import IPython
+import os.path
 
-def parse_user_rating_file(filename, shrink_size):
-    # First pass, count the number of user and items (movies).
-    print "####### Start parsing #######"
-    user_dict = {}
-    movie_dict = {}
-    with open(filename, 'r') as f:
-        f.readline()
-        file_iter = csv.reader(f, delimiter=',')
-        iter_counter = 0
-        for row in file_iter:
-            iter_counter += 1
-            if iter_counter % 1000000 == 0:
-                print iter_counter
-            user_id = row[0]
-            movie_id = row[1]
-            user_dict[user_id] = None
-            movie_dict[movie_id] = None
-    num_user = len(user_dict)
-    num_movie = len(movie_dict)
-    print "Num of user is:", num_user, ", Num of movie is:", num_movie
+def parse_user_rating_file(filename, shrink_size, select_data):
+    if not os.path.isfile(filename):
+        # First pass, count the number of user and items (movies).
+        print "####### Start parsing #######"
+        user_dict = {}
+        movie_dict = {}
+        with open(filename, 'r') as f:
+            f.readline()
+            file_iter = csv.reader(f, delimiter=',')
+            iter_counter = 0
+            for row in file_iter:
+                iter_counter += 1
+                if iter_counter % 1000000 == 0:
+                    print iter_counter
+                user_id = row[0]
+                movie_id = row[1]
+                user_dict[user_id] = None
+                movie_dict[movie_id] = None
+        num_user = len(user_dict)
+        num_movie = len(movie_dict)
+        print "Num of user is:", num_user, ", Num of movie is:", num_movie
 
-    rating_matrix = lil_matrix((num_user, num_movie)) # size: num_user x num_movie
+        rating_matrix = lil_matrix((num_user, num_movie)) # size: num_user x num_movie
 
-    # Second pass, populate the rating matrix.
-    print "####### Start populating rating matrix #######"
-    user_dict = {}
-    movie_dict = {}
-    user_counter = 0
-    movie_counter = 0
-    with open(filename, 'r') as f:
-        f.readline()
-        file_iter = csv.reader(f, delimiter=',')
-        iter_counter = 0
-        for row in file_iter:
-            iter_counter += 1
-            if iter_counter % 1000000 == 0:
-                print iter_counter
-            user_id = row[0]
-            movie_id = row[1]
-            rating = float(row[2])
-            if user_id not in user_dict:
-                user_dict[user_id] = user_counter
-                user_counter += 1
-            user_position = user_dict[user_id]
-            if movie_id not in movie_dict:
-                movie_dict[movie_id] = movie_counter
-                movie_counter += 1
-            movie_position = movie_dict[movie_id]
-            rating_matrix[user_position, movie_position] = rating
+        # Second pass, populate the rating matrix.
+        print "####### Start populating rating matrix #######"
+        user_dict = {}
+        movie_dict = {}
+        user_counter = 0
+        movie_counter = 0
+        with open(filename, 'r') as f:
+            f.readline()
+            file_iter = csv.reader(f, delimiter=',')
+            iter_counter = 0
+            for row in file_iter:
+                iter_counter += 1
+                if iter_counter % 1000000 == 0:
+                    print iter_counter
+                user_id = row[0]
+                movie_id = row[1]
+                rating = float(row[2])
+                if user_id not in user_dict:
+                    user_dict[user_id] = user_counter
+                    user_counter += 1
+                user_position = user_dict[user_id]
+                if movie_id not in movie_dict:
+                    movie_dict[movie_id] = movie_counter
+                    movie_counter += 1
+                movie_position = movie_dict[movie_id]
+                rating_matrix[user_position, movie_position] = rating
+    else:
+        rating_matrix = read_from_matrix('../data/ratings.mtx')
 
     print "####### Finished parsing #########"
+    print "####### Selecting data #########"
+    # Select data according to row and col thresh specified.
+    IPython.embed()
+    if select_data:
+        x_thresh, y_thresh = select_data
+        (x,y,z) = scipy.sparse.find(rating_matrix)
+        x_countings = np.bincount(x)
+        y_countings = np.bincount(y)
+        rating_matrix = rating_matrix[x_countings>=x_thresh, :]
+        rating_matrix = rating_matrix[:, y_countings>=y_thresh]
+        IPython.embed()
+        return rating_matrix
+
+    # Return only the first shrink_size part of the matrix.
     if shrink_size:
         return rating_matrix[:shrink_size[0], :shrink_size[1]]
-    else:
-        return rating_matrix
+    return rating_matrix
 
 def get_test_set(test_percentage, rating_matrix):
     non_zero_entries = np.array(rating_matrix.nonzero())  # 2 x k
@@ -106,35 +124,32 @@ def get_training_matrix(train_usage, test_set, rating_matrix):
 
 def get_toy_dataset(num_row, num_col, rank, fill_rate, bias_flag = 0, noise_level=0):
     np.random.seed(229)
-    
+
     # low rank matrix
     A = np.random.randn(num_row, rank)
     B = np.random.randn(rank, num_col)
     C = A.dot(B)
-    
+
     # User and item bias
     if bias_flag != 0:
         x = np.random.randn(num_row, 1)
         y = np.random.randn(1, num_col)
         C += x * np.ones((1,num_col)) + np.ones((num_row,1)) * y
-    
+
     # Random noise
     if noise_level > 0:
         C += np.random.randn(num_row, num_col) * np.sqrt(noise_level)
-    
+
     # partial observation
     E = (np.random.rand(num_row, num_col) > fill_rate)
     C[E] = 0
     C = lil_matrix(C)
     return C
 
-def read_from_matrix(filepath, shrink_size):
+def read_from_matrix(filepath):
     raw_matrix = mmread(filepath)
     raw_matrix = raw_matrix.tolil()
-    if shrink_size:
-        return raw_matrix[:shrink_size[0], :shrink_size[1]]
-    else:
-        return raw_matrix
+    return raw_matrix
 
 
 # Sample usage.
