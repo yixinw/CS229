@@ -74,7 +74,11 @@ def parse_user_rating_file(filename, shrink_size):
 
     print "####### Finished parsing #########"
     if shrink_size:
-        return rating_matrix[:shrink_size[0], :shrink_size[1]]
+        if shrink_size[0] == rating_matrix[0] and \
+                shrink_size[1] == rating_matrix[1]:
+            return rating_matrix
+        else:
+            return rating_matrix[:shrink_size[0], :shrink_size[1]]
     else:
         return rating_matrix
 
@@ -132,7 +136,11 @@ def read_from_matrix(filepath, shrink_size):
     raw_matrix = mmread(filepath)
     raw_matrix = raw_matrix.tolil()
     if shrink_size:
-        return raw_matrix[:shrink_size[0], :shrink_size[1]]
+        if shrink_size[0] == raw_matrix[0] and \
+                shrink_size[1] == raw_matrix[1]:
+            return raw_matrix
+        else:
+            return raw_matrix[:shrink_size[0], :shrink_size[1]]
     else:
         return raw_matrix
 

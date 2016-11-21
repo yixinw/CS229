@@ -17,7 +17,9 @@ def predict(training_matrix, test_set):
     prediction = average_movie_rating[test_movies]
 
     # Set those division by zero things to default rating.
-    default_rating = 2.5
+    
+    A = training_matrix[training_matrix.nonzero()].tocsr()
+    default_rating = (A.max() + A.min())/2
     prediction[np.isnan(prediction)] = default_rating
 
     return prediction
