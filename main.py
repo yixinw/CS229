@@ -11,7 +11,7 @@ import IPython
 
 def main(argv):
     FLAGS_parse_data = False
-    FLAGS_toy = False
+    FLAGS_toy = True
     # Set shrink_size=None if you don't want to shrink data set.
     # shrink_size is ignored if select_data_thresh is specified.
     shrink_size = [1000, 2000]
