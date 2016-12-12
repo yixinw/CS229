@@ -67,31 +67,33 @@ def run(fill_rate, noise, method):
 # Case 1: Noise free, fill rate 0.05, 0.1, ..., 0.3.
 data_dir = '../data/'
 method = 'MGD1'
-RMSE_list = np.zeros(6)
-noise = 0
-fill_rate_list = np.linspace(0.05, 0.3, num=6)
-for i,fill_rate in enumerate(fill_rate_list):
-    RMSE = run(fill_rate=fill_rate, noise=noise, method=method)
-    RMSE_list[i] = RMSE
-print "Finished case 1. RMSE is"
-print RMSE_list
-sio.savemat(data_dir+method+'_case1.mat', {method+'_case1':RMSE_list})
+#RMSE_list = np.zeros(6)
+#noise = 0
+#fill_rate_list = np.linspace(0.05, 0.3, num=6)
+#for i,fill_rate in enumerate(fill_rate_list):
+#    RMSE = run(fill_rate=fill_rate, noise=noise, method=method)
+#    RMSE_list[i] = RMSE
+#print "Finished case 1. RMSE is"
+#print RMSE_list
+#sio.savemat(data_dir+method+'_case1.mat', {method+'_case1':RMSE_list})
 
 # Case 2: Constant noise, fill rate 0.05, 0.1, ..., 0.3.
-RMSE_list = np.zeros(6)
-noise = 0.1
-fill_rate_list = np.linspace(0.05, 0.3, num=6)
-for i,fill_rate in enumerate(fill_rate_list):
-    RMSE = run(fill_rate=fill_rate, noise=noise, method=method)
-    RMSE_list[i] = RMSE
-print "Finished case 2. RMSE is"
-print RMSE_list
-sio.savemat(data_dir+method+'_case2.mat', {method+'_case2':RMSE_list})
+#RMSE_list = np.zeros(6)
+#noise = 0.07
+#fill_rate_list = np.linspace(0.3, 0.05, num=6)
+#print fill_rate_list
+#for i,fill_rate in enumerate(fill_rate_list):
+#    RMSE = run(fill_rate=fill_rate, noise=noise, method=method)
+#    RMSE_list[i] = RMSE
+#print "Finished case 2. RMSE is"
+#RMSE_list = RMSE_list[::-1]
+#print RMSE_list
+#sio.savemat(data_dir+method+'_case2.mat', {method+'_case2':RMSE_list})
 
 # Case 3: Noise 0.001, 0.005,
 RMSE_list = np.zeros(7)
 fill_rate = 0.3
-noise_list = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
+noise_list = [0.0007, 0.0035, 0.007, 0.035, 0.07, 0.35, 0.7]
 for i,noise in enumerate(noise_list):
     RMSE = run(fill_rate=fill_rate, noise=noise, method=method)
     RMSE_list[i] = RMSE

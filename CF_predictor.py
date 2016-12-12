@@ -31,7 +31,7 @@ def item_item_predict(training_matrix, test_set):
         weights = similarity[movie]
         rated_movies = (training_matrix_dense[user, :] != 0)
         # Normalize the weights so that their absolute
-        #values sum to 1.
+        # values sum to 1.
         normalization = np.sum(np.abs(weights[rated_movies]))
         if normalization == 0:
             print "Invalid normalizer in CF. Using default value."

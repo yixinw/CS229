@@ -11,7 +11,7 @@ import IPython
 
 def main(argv):
     FLAGS_parse_data = False
-    FLAGS_toy = True
+    FLAGS_toy = False
     # Set shrink_size=None if you don't want to shrink data set.
     # shrink_size is ignored if select_data_thresh is specified.
     shrink_size = [1000, 2000]
@@ -26,7 +26,7 @@ def main(argv):
     rating_matrixname = 'ratings_selected_1003_2034.mtx'
     test_percentage = 0.1
     train_usage = 1.0
-    method = 'MGD1'
+    method = 'CF'
     evaluate_error_metric = 'RMSE'
 
     # Load data matrix.

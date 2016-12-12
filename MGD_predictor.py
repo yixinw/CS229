@@ -32,7 +32,7 @@ def MGD1_predictor(training_matrix, test_set, r=5, trunc_flag=0):
         temp = ss.lil_matrix(training_matrix - np.ones((num_user,1))*average_movie_rating_y-average_movie_rating_x.T * np.ones((1,num_movie)) )
         training_matrix = temp.multiply(training_matrix!=0)
 
-    completed_mat = Manifold_descent.manifold_descent(training_matrix,r,50)
+    completed_mat = Manifold_descent.manifold_descent(training_matrix,r,30)
     result = np.asarray(completed_mat[tuple(test_set)])
     if trunc_flag:
         prediction_y = average_movie_rating_y[0,test_set[1]]

@@ -130,7 +130,7 @@ def manifold_descent(A, r, max_iter=20, err_thresh=1e-4, penalty=2, alpha=0.5, b
         S = S_new
         print "Fitted error after iteration %d is: %f." %(count+1, np.sqrt(cost_new)/np.sqrt(len(id_row)))
         print "Stepsize at iteration %d: %f" %(count+1, t)
-        if cost_new < err_thresh:
+        if cost_new < err_thresh or cost-cost_new < err_thresh/10.:
             break
         cost = cost_new
         t *= 4
